@@ -115,6 +115,10 @@ static const char PyCursesVersion[] = "2.2";
 #define STRICT_SYSV_CURSES
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #define CURSES_MODULE
 #include "py_curses.h"
 
@@ -3373,7 +3377,9 @@ static PyObject *
 _curses_setupterm_impl(PyObject *module, const char *term, int fd)
 /*[clinic end generated code: output=4584e587350f2848 input=4511472766af0c12]*/
 {
+#ifndef _WIN32
     int err;
+#endif
 
     if (fd == -1) {
         PyObject* sys_stdout;
@@ -3394,6 +3400,7 @@ _curses_setupterm_impl(PyObject *module, const char *term, int fd)
         }
     }
 
+#ifndef _WIN32
     if (!initialised_setupterm && setupterm((char *)term, fd, &err) == ERR) {
         const char* s = "setupterm: unknown error";
 
@@ -3406,6 +3413,7 @@ _curses_setupterm_impl(PyObject *module, const char *term, int fd)
         PyErr_SetString(PyCursesError,s);
         return NULL;
     }
+#endif
 
     initialised_setupterm = TRUE;
 
